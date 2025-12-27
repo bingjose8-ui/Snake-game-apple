@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Apple Game</title>
+<style>
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+canvas {
+    background: #222;
+    margin-top: 20px;
+    display: block;
+    border: 2px solid white;
+}
+#score {
+    margin-top: 10px;
+    font-size: 20px;
+}
+#controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#controls button {
+    margin: 5px;
+    padding: 15px 25px;
+    font-size: 18px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#controls button:active {
+    background: #555;
+}
+</style>
+</head>
+<body>
+<h1>Snake Apple Game</h1>
+
+<div id="controls">
+  <button id="up">↑</button>
+  <div>
+    <button id="left">←</button>
+    <button id="down">↓</button>
+    <button id="right">→</button>
+  </div>
+</div>
+
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+<div id="score">Apples eaten: 0</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const cellSize = 20;
+let snake = [{ x: 300, y: 200 }];
+let direction = 'ArrowRight';
+let apples = [{ x: Math.random() * (canvas.width - cellSize), y: Math.random() * (canvas.height - cellSize) }];
+let appleCount = 0;
+let gameInterval;
+let speed = 100; // milliseconds per frame
+
+function drawSnake() {
+    ctx.fillStyle = '#FF00FF'; // Bright purple snake
+    snake.forEach(part => ctx.fillRect(part.x, part.y, cellSize, cellSize));
+}
+
+function drawApples() {
+    ctx.fillStyle = '#FF0000'; // Bright red apples
+    apples.forEach(a => ctx.fillRect(a.x, a.y, cellSize, cellSize));
+}
+
+function moveSnake() {
+    let head = { ...snake[0] };
+    if(direction === 'ArrowUp') head.y -= cellSize;
+    if(direction === 'ArrowDown') head.y += cellSize;
+    if(direction === 'ArrowLeft') head.x -= cellSize;
+    if(direction === 'ArrowRight') head.x += cellSize;
+
+    if(head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+        gameOver();
+        return;
+    }
+
+    snake.unshift(head);
+
+    let ateApple = false;
+    apples.forEach((apple) => {
+        if(Math.abs(head.x - apple.x) < cellSize && Math.abs(head.y - apple.y) < cellSize) {
+            ateApple = true;
+            appleCount++;
+            document.getElementById('score').textContent = `Apples eaten: ${appleCount}`;
+
+            if(appleCount === 1) {
+                apples.push({ x: Math.random() * (canvas.width - cellSize), y: Math.random() * (canvas.height - cellSize) });
+            } else {
+                let newApples = [];
+                apples.forEach(a => {
+                    newApples.push({ x: Math.random() * (canvas.width - cellSize), y: Math.random() * (canvas.height - cellSize) });
+                    newApples.push({ x: Math.random() * (canvas.width - cellSize), y: Math.random() * (canvas.height - c
